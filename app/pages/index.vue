@@ -1,39 +1,59 @@
 <script setup lang="ts">
-import type { FormData } from '~/server/api/form.get'
-import { useBreakpoints } from '@vueuse/core'
+import { ref, watch, computed } from 'vue';
+import { useBreakpoints } from '@vueuse/core';
+import type { FormData } from '~/server/api/form.get';
 
-const { data } = await useFetch<FormData>('/api/form')
+const { data: lyceesList } = await useFetch<string[]>('/api/lycees');
+const allLycees = computed(() => lyceesList.value ?? []);
 
-const lycee = ref(data.value?.lycee ?? '')
-const classe = ref<string | null>(data.value?.classe ?? null)
-const bac = ref<string | null>(data.value?.type ?? null)
+const { data: initialFormData, refresh } = await useFetch<FormData>('/api/form');
 
-const tempClasse = ref(classe.value)
-const tempBac = ref(bac.value)
+const lycee = ref(initialFormData.value?.lycee ?? '');
+const classe = ref<string | null>(initialFormData.value?.classe ?? null);
+const bac = ref<string | null>(initialFormData.value?.type ?? null);
 
-const isClasseOpen = ref(false)
+const tempClasse = ref(classe.value);
+const tempBac = ref(bac.value);
 
-const breakpoints = useBreakpoints({ lg: 1024 })
-const isDesktop = breakpoints.greater('lg')
+const isClasseOpen = ref(false);
 
 const confirmClasse = () => {
-  classe.value = tempClasse.value
-  bac.value = tempBac.value
-  isClasseOpen.value = false
-}
+  classe.value = tempClasse.value;
+  bac.value = tempBac.value;
+  isClasseOpen.value = false;
+};
 
 watch(isClasseOpen, (open) => {
   if (!open) {
-    tempClasse.value = classe.value
-    tempBac.value = bac.value
+    tempClasse.value = classe.value;
+    tempBac.value = bac.value;
   }
-})
+});
+
+const updateLycee = (newLycee: string) => {
+  lycee.value = newLycee;
+  classe.value = null;
+  bac.value = null;
+  tempClasse.value = null;
+  tempBac.value = null;
+};
+
+const breakpoints = useBreakpoints({
+  sm: 640, md: 768, lg: 1024
+});
+const isDesktop = breakpoints.greater('lg');
 </script>
 
 <template>
   <div class="flex-1 w-full flex flex-col gap-4 items-stretch">
     <div class="w-full max-w-3xl flex flex-col gap-4 self-center flex-1">
-      <EMSchoolCard :lycee="lycee" location="Lille" type="Lycée Public" />
+      <EMSchoolCard
+          :lycee="lycee"
+          :lycees="allLycees"
+          @update:lycee="updateLycee"
+          location="Lille"
+          type="Lycée Public"
+      />
 
       <EMAccordion
           v-model:open="isClasseOpen"
@@ -70,15 +90,16 @@ watch(isClasseOpen, (open) => {
 
       <EMAccordion title="Spécialités" helper="À compléter" :show-helper="true" />
       <EMAccordion title="Notes" helper="À compléter" :show-helper="true" />
-        <div v-if="isDesktop" class="w-full flex justify-center">
-        <EMButton  variant="primary" :disabled="!classe || !bac">
+
+      <div v-if="isDesktop" class="w-full flex justify-center mt-4">
+        <EMButton full-width variant="primary" :disabled="!classe || !bac">
           Confirmer
         </EMButton>
       </div>
     </div>
 
-    <div v-if="!isDesktop" class=" w-full flex justify-center">
-      <EMButton  variant="primary" :disabled="!classe || !bac">
+    <div v-if="!isDesktop" class="w-full flex justify-center mt-6">
+      <EMButton full-width variant="primary" :disabled="!classe || !bac">
         Confirmer
       </EMButton>
     </div>
