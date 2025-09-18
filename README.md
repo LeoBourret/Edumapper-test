@@ -63,6 +63,7 @@ Bienvenue sur le projet Edumapper, développé dans le cadre d'un test technique
 ## 💡 Remarque
 
 - **Intégration de la Police "DM Sans"** : Malgré l'utilisation du module `@nuxt/fonts`, l'intégration de la police "DM Sans" via la configuration de Tailwind CSS v4 n'a pas pu être finalisée dans le temps imparti. Ayant principalement travaillé avec Tailwind CSS v3, l'adaptation à la nouvelle méthode de configuration des fonts en v4 a présenté des difficultés, et ce point a été mis de côté pour privilégier la livraison des fonctionnalités.
+- **Avertissements d'Hydratation (Console)** : Des avertissements de type "Hydration node mismatch" peuvent apparaître dans la console de développement. Cela est une conséquence normale et attendue de l'appel à une API de données aléatoires (`/api/form`) exécutée à la fois côté serveur (pour le rendu initial) et côté client (pour l'hydratation). Le contenu aléatoire étant susceptible de différer à chaque exécution, Vue détecte une incohérence temporaire qui est rapidement résolue sans impact visible sur l'expérience utilisateur.
 
 ---
 

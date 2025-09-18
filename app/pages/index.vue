@@ -3,17 +3,31 @@ import { ref, watch, computed } from 'vue';
 import { useBreakpoints } from '@vueuse/core';
 import type { FormData } from '~/server/api/form.get';
 
-const { data: lyceesList } = await useFetch<string[]>('/api/lycees');
+const { data: lyceesList } = await useFetch<string[]>('/api/lycees', {
+  key: 'all-lycees',
+});
 const allLycees = computed(() => lyceesList.value ?? []);
 
-const { data: initialFormData, refresh } = await useFetch<FormData>('/api/form');
+const lycee = ref<string | null>(null);
+const classe = ref<string | null>(null);
+const bac = ref<string | null>(null);
 
-const lycee = ref(initialFormData.value?.lycee ?? '');
-const classe = ref<string | null>(initialFormData.value?.classe ?? null);
-const bac = ref<string | null>(initialFormData.value?.type ?? null);
+const { data: initialFormData, refresh } = await useFetch<FormData>('/api/form', {
+  key: 'random-form-data',
+});
 
 const tempClasse = ref(classe.value);
 const tempBac = ref(bac.value);
+
+watch(initialFormData, (newData) => {
+  if (newData) {
+    lycee.value = newData.lycee ?? null;
+    classe.value = newData.classe ?? null;
+    bac.value = newData.type ?? null;
+    tempClasse.value = classe.value;
+    tempBac.value = bac.value;
+  }
+}, { immediate: true });
 
 const isClasseOpen = ref(false);
 
@@ -30,12 +44,13 @@ watch(isClasseOpen, (open) => {
   }
 });
 
-const updateLycee = (newLycee: string) => {
+const updateLycee = async (newLycee: string) => {
   lycee.value = newLycee;
   classe.value = null;
   bac.value = null;
   tempClasse.value = null;
   tempBac.value = null;
+  await refresh();
 };
 
 const breakpoints = useBreakpoints({
@@ -48,7 +63,7 @@ const isDesktop = breakpoints.greater('lg');
   <div class="flex-1 w-full flex flex-col gap-4 items-stretch">
     <div class="w-full max-w-3xl flex flex-col gap-4 self-center flex-1">
       <EMSchoolCard
-          :lycee="lycee"
+          :lycee="lycee ?? ''"
           :lycees="allLycees"
           @update:lycee="updateLycee"
           location="Lille"
