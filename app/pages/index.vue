@@ -92,14 +92,14 @@ const isDesktop = breakpoints.greater('lg');
       <EMAccordion title="Notes" helper="À compléter" :show-helper="true" />
 
       <div v-if="isDesktop" class="w-full flex justify-center mt-4">
-        <EMButton full-width variant="primary" :disabled="!classe || !bac">
+        <EMButton  variant="primary" :disabled="!classe || !bac">
           Confirmer
         </EMButton>
       </div>
     </div>
 
     <div v-if="!isDesktop" class="w-full flex justify-center mt-6">
-      <EMButton full-width variant="primary" :disabled="!classe || !bac">
+      <EMButton  variant="primary" :disabled="!classe || !bac">
         Confirmer
       </EMButton>
     </div>
