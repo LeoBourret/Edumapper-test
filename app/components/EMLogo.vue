@@ -3,7 +3,7 @@
 
 <template>
   <img
-      src="/assets/logo/edumapper.svg"
+      src="/assets/logo/logo.svg"
       alt="Edumapper Logo"
       class="h-6 w-auto"
   />

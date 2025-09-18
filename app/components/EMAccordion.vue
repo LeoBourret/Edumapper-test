@@ -5,21 +5,22 @@ const props = defineProps<{
   description?: string
   showHelper?: boolean
   showDescription?: boolean
-  defaultOpen?: boolean
+  open?: boolean
 }>()
 
-const isOpen = ref(props.defaultOpen ?? false)
+const emit = defineEmits(['update:open'])
+
+const isOpen = computed({
+  get: () => props.open ?? false,
+  set: (val: boolean) => emit('update:open', val)
+})
+
 const toggle = () => (isOpen.value = !isOpen.value)
 </script>
 
 <template>
-  <div
-      class="w-full max-w-[720px] rounded-xl bg-white border border-gray-200 p-5 shadow-sm"
-  >
-    <button
-        @click="toggle"
-        class="w-full flex justify-between items-center cursor-pointer"
-    >
+  <div class="w-full max-w-[720px] rounded-xl bg-white border border-gray-200 p-5 shadow-sm">
+    <button @click="toggle" class="w-full flex justify-between items-center cursor-pointer">
       <div class="flex flex-col items-start">
         <div class="font-semibold text-gray-900">{{ title }}</div>
         <div v-if="!isOpen && showDescription && description" class="text-sm text-gray-700">

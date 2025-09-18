@@ -15,14 +15,17 @@ const toggle = (opt: string) => {
     const current = Array.isArray(props.modelValue)
         ? [...props.modelValue]
         : []
-    emit(
-        "update:modelValue",
-        current.includes(opt)
-            ? current.filter(o => o !== opt)
-            : [...current, opt]
-    )
+    if (current.includes(opt)) {
+      emit("update:modelValue", current.filter(o => o !== opt))
+    } else {
+      emit("update:modelValue", [...current, opt])
+    }
   } else {
-    emit("update:modelValue", opt)
+    if (props.modelValue === opt) {
+      emit("update:modelValue", null)
+    } else {
+      emit("update:modelValue", opt)
+    }
   }
 }
 
